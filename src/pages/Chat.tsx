@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { BreathingExercise } from "@/components/BreathingExercise";
-import { Send, LogOut, AlertCircle } from "lucide-react";
+import { Send, LogOut, AlertCircle, Wind } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Message {
@@ -21,6 +21,7 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [showBreathingExercise, setShowBreathingExercise] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -79,6 +80,18 @@ const Chat = () => {
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
+    const lowerMessage = userMessage.toLowerCase();
+    
+    // Check for breathing exercise keywords
+    const breathingKeywords = [
+      "breathing exercise", "calm down", "relax", "anxiety",
+      "stressed", "panic", "overwhelmed", "breathing", "calm me"
+    ];
+    
+    if (breathingKeywords.some(keyword => lowerMessage.includes(keyword))) {
+      setShowBreathingExercise(true);
+    }
+    
     setInput("");
     setLoading(true);
 
@@ -246,6 +259,15 @@ const Chat = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-border/50 shadow-lg">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowBreathingExercise(!showBreathingExercise)}
+              className="h-12 w-12 rounded-full flex-shrink-0 text-primary hover:bg-primary/10"
+              title="Breathing Exercise"
+            >
+              <Wind className="w-5 h-5" />
+            </Button>
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -270,7 +292,9 @@ const Chat = () => {
       </div>
 
       {/* Breathing Exercise Widget */}
-      <BreathingExercise />
+      {showBreathingExercise && (
+        <BreathingExercise onClose={() => setShowBreathingExercise(false)} />
+      )}
     </div>
   );
 };
